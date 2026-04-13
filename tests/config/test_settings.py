@@ -16,5 +16,5 @@ def test_load_models_default():
     os.environ["MINIMAX_API_KEY"] = "my-key"
     models = load_models()
     assert len(models) >= 1
-    assert models[0]["id"] == "minimax-abab65"
+    assert models[0]["id"] == "minimax-m27"
     assert models[0]["api_key"] == "my-key"

@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 
 class MemoryStore:
-    def __init__(self, data_dir: str, default_skill: str = "default", default_model: str = "minimax-abab65", max_history: int = 20):
+    def __init__(self, data_dir: str, default_skill: str = "default", default_model: str = "minimax-m27", max_history: int = 20):
         self.data_dir = data_dir
         self.default_skill = default_skill
         self.default_model = default_model

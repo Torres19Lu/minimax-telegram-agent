@@ -9,7 +9,7 @@ def test_memory_store():
         store = MemoryStore(data_dir=tmpdir, max_history=3)
         state = store.get_state(123)
         assert state["current_skill"] == "default"
-        assert state["current_model"] == "minimax-abab65"
+        assert state["current_model"] == "minimax-m27"
         assert state["history"] == []
 
         store.add_message(123, "user", "hello")

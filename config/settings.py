@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     minimax_api_key: str
     data_dir: str = "/app/data"
     models_json: str = ""
-    default_model: str = "minimax-abab65"
+    default_model: str = "minimax-m27"
     max_history: int = 20
 
 
@@ -22,19 +22,19 @@ def load_models(settings: Settings | None = None) -> List[Dict[str, Any]]:
     else:
         raw = [
             {
-                "id": "minimax-abab65",
-                "name": "MiniMax abab6.5",
+                "id": "minimax-m27",
+                "name": "MiniMax M2.7",
                 "provider": "minimax",
-                "model": "abab6.5-chat",
-                "base_url": "https://api.minimax.chat/v1",
+                "model": "MiniMax-M2.7",
+                "base_url": "https://api.minimaxi.com/v1",
                 "api_key": settings.minimax_api_key,
             },
             {
-                "id": "minimax-abab65s",
-                "name": "MiniMax abab6.5s",
+                "id": "minimax-m27-highspeed",
+                "name": "MiniMax M2.7 极速版",
                 "provider": "minimax",
-                "model": "abab6.5s-chat",
-                "base_url": "https://api.minimax.chat/v1",
+                "model": "MiniMax-M2.7-highspeed",
+                "base_url": "https://api.minimaxi.com/v1",
                 "api_key": settings.minimax_api_key,
             },
         ]

@@ -1,0 +1,46 @@
+{
+  "current_skill": "default",
+  "current_model": "minimax-abab65",
+  "history": [
+    {
+      "role": "user",
+      "content": "who are you"
+    },
+    {
+      "role": "assistant",
+      "content": "调用模型时出错了: Error code: 500 - {'type': 'error', 'error': {'type': 'server_error', 'message': 'your current token plan not support model, abab6.5-chat (2061)', 'http_code': '500'}, 'request_id': '062c28940ef13bf0d0cde44a0afffd8b'}"
+    },
+    {
+      "role": "user",
+      "content": "Hello"
+    },
+    {
+      "role": "assistant",
+      "content": "调用模型时出错了: Error code: 500 - {'type': 'error', 'error': {'type': 'server_error', 'message': 'your current token plan not support model, abab6.5-chat (2061)', 'http_code': '500'}, 'request_id': '062c289992979f0dc715f9149f5cd053'}"
+    },
+    {
+      "role": "user",
+      "content": "Hello"
+    },
+    {
+      "role": "assistant",
+      "content": "调用模型时出错了: Error code: 500 - {'type': 'error', 'error': {'type': 'server_error', 'message': 'your current token plan not support model, abab6.5-chat (2061)', 'http_code': '500'}, 'request_id': '062c289ca56b7eda44313f52a1961d86'}"
+    },
+    {
+      "role": "user",
+      "content": "Hello"
+    },
+    {
+      "role": "assistant",
+      "content": "调用模型时出错了: Error code: 500 - {'type': 'error', 'error': {'type': 'server_error', 'message': 'your current token plan not support model, abab6.5-chat (2061)', 'http_code': '500'}, 'request_id': '062c28a0b181b5cfdb0fe5384d787afa'}"
+    },
+    {
+      "role": "user",
+      "content": "你好"
+    },
+    {
+      "role": "assistant",
+      "content": "调用模型时出错了: Unknown model: minimax-abab65"
+    }
+  ]
+}
