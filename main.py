@@ -8,6 +8,7 @@ from memory.store import MemoryStore
 from llm.client import LLMClient
 from bot.commands import skill_command, model_command, reset_command
 from bot.handlers import message_handler
+from tools.search import web_search
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -28,12 +29,16 @@ def main():
         max_history=settings.max_history,
     )
     llm = LLMClient(models)
+    tools = {
+        "web_search": web_search,
+    }
 
     application = ApplicationBuilder().token(settings.telegram_bot_token).build()
     application.bot_data["skills"] = skills
     application.bot_data["models"] = models
     application.bot_data["memory"] = memory
     application.bot_data["llm"] = llm
+    application.bot_data["tools"] = tools
 
     application.add_handler(CommandHandler("skill", skill_command))
     application.add_handler(CommandHandler("model", model_command))

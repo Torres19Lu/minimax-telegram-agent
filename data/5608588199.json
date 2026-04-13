@@ -1,46 +1,14 @@
 {
   "current_skill": "default",
-  "current_model": "minimax-abab65",
+  "current_model": "minimax-m27",
   "history": [
     {
       "role": "user",
-      "content": "who are you"
+      "content": "今天厦门的天气怎么样"
     },
     {
       "role": "assistant",
-      "content": "调用模型时出错了: Error code: 500 - {'type': 'error', 'error': {'type': 'server_error', 'message': 'your current token plan not support model, abab6.5-chat (2061)', 'http_code': '500'}, 'request_id': '062c28940ef13bf0d0cde44a0afffd8b'}"
-    },
-    {
-      "role": "user",
-      "content": "Hello"
-    },
-    {
-      "role": "assistant",
-      "content": "调用模型时出错了: Error code: 500 - {'type': 'error', 'error': {'type': 'server_error', 'message': 'your current token plan not support model, abab6.5-chat (2061)', 'http_code': '500'}, 'request_id': '062c289992979f0dc715f9149f5cd053'}"
-    },
-    {
-      "role": "user",
-      "content": "Hello"
-    },
-    {
-      "role": "assistant",
-      "content": "调用模型时出错了: Error code: 500 - {'type': 'error', 'error': {'type': 'server_error', 'message': 'your current token plan not support model, abab6.5-chat (2061)', 'http_code': '500'}, 'request_id': '062c289ca56b7eda44313f52a1961d86'}"
-    },
-    {
-      "role": "user",
-      "content": "Hello"
-    },
-    {
-      "role": "assistant",
-      "content": "调用模型时出错了: Error code: 500 - {'type': 'error', 'error': {'type': 'server_error', 'message': 'your current token plan not support model, abab6.5-chat (2061)', 'http_code': '500'}, 'request_id': '062c28a0b181b5cfdb0fe5384d787afa'}"
-    },
-    {
-      "role": "user",
-      "content": "你好"
-    },
-    {
-      "role": "assistant",
-      "content": "调用模型时出错了: Unknown model: minimax-abab65"
+      "content": "<think>\n搜索结果并没有返回厦门天气的相关信息，全是些不相关的商业新闻。我应该告诉用户我无法获取到实时的厦门天气信息，并建议他们查看天气预报网站或应用。\n</think>\n\n抱歉，我无法获取到厦门今天的实时天气信息。\n\n建议您可以通过以下方式查询：\n\n1. **天气预报网站**：中国天气网（weather.com.cn）、天气在线等\n2. **手机应用**：墨迹天气、彩云天气等\n3. **搜索引擎**：直接搜索\"厦门天气\"或\"厦门天气预报\"\n4. **语音助手**：Siri、小爱同学等可以直接语音查询\n\n这些都是获取实时天气信息的可靠渠道。"
     }
   ]
 }

@@ -6,7 +6,7 @@ from bot.handlers import message_handler
 
 
 @pytest.mark.asyncio
-async def test_message_handler():
+async def test_message_handler_without_tools():
     update = MagicMock(spec=Update)
     update.effective_user.id = 42
     update.message = MagicMock()
@@ -22,10 +22,13 @@ async def test_message_handler():
 
     skills = {"default": MagicMock(system_prompt="you are helpful")}
     llm_client = MagicMock()
-    llm_client.chat.return_value = "hi there"
+    assistant_msg = MagicMock()
+    assistant_msg.content = "hi there"
+    assistant_msg.tool_calls = None
+    llm_client.chat_with_tools.return_value = assistant_msg
 
     context = MagicMock(spec=ContextTypes.DEFAULT_TYPE)
-    context.bot_data = {"memory": memory, "skills": skills, "llm": llm_client}
+    context.bot_data = {"memory": memory, "skills": skills, "llm": llm_client, "tools": {}}
 
     await message_handler(update, context)
     update.message.reply_text.assert_awaited_once_with("hi there")
