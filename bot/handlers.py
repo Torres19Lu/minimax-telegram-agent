@@ -1,12 +1,17 @@
 import json
+import os
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from tools.voice import transcribe_voice
 
-async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+
+async def _process_user_input(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    user_text: str,
+) -> None:
     user_id = update.effective_user.id
-    user_text = update.message.text or ""
-
     memory = context.bot_data["memory"]
     skills = context.bot_data["skills"]
     llm = context.bot_data["llm"]
@@ -24,7 +29,6 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     messages.extend(history)
     messages.append({"role": "user", "content": user_text})
 
-    # Define available tools for the LLM
     tool_definitions = [
         {
             "type": "function",
@@ -54,9 +58,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await update.message.reply_text(reply)
         return
 
-    # Handle tool calls
     if assistant_message.tool_calls:
-        # Add assistant message with tool_calls to conversation
         messages.append({
             "role": "assistant",
             "content": assistant_message.content or "",
@@ -99,3 +101,36 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     memory.add_message(user_id, "user", user_text)
     memory.add_message(user_id, "assistant", reply)
     await update.message.reply_text(reply)
+
+
+async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_text = update.message.text or ""
+    await _process_user_input(update, context, user_text)
+
+
+async def voice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    voice = update.message.voice
+    if not voice:
+        await update.message.reply_text("没有收到语音消息。")
+        return
+
+    await update.message.reply_text("🎙️ 正在识别语音，请稍等...")
+
+    # Download voice file
+    voice_file = await voice.get_file()
+    ogg_path = f"/tmp/voice_{update.effective_user.id}_{voice.file_unique_id}.ogg"
+    await voice_file.download_to_drive(ogg_path)
+
+    openai_key = context.bot_data.get("openai_api_key", "")
+    transcribed = transcribe_voice(ogg_path, openai_key)
+
+    # Clean up downloaded file
+    if os.path.exists(ogg_path):
+        os.remove(ogg_path)
+
+    if transcribed.startswith("语音转文字") or transcribed.startswith("音频转换") or transcribed.startswith("语音"):
+        await update.message.reply_text(f"❌ {transcribed}")
+        return
+
+    await update.message.reply_text(f"📝 识别结果: {transcribed}")
+    await _process_user_input(update, context, transcribed)

@@ -7,7 +7,7 @@ from skills.loader import load_skills
 from memory.store import MemoryStore
 from llm.client import LLMClient
 from bot.commands import skill_command, model_command, reset_command
-from bot.handlers import message_handler
+from bot.handlers import message_handler, voice_handler
 from tools.search import web_search
 
 logging.basicConfig(
@@ -39,11 +39,13 @@ def main():
     application.bot_data["memory"] = memory
     application.bot_data["llm"] = llm
     application.bot_data["tools"] = tools
+    application.bot_data["openai_api_key"] = settings.openai_api_key
 
     application.add_handler(CommandHandler("skill", skill_command))
     application.add_handler(CommandHandler("model", model_command))
     application.add_handler(CommandHandler("reset", reset_command))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
+    application.add_handler(MessageHandler(filters.VOICE, voice_handler))
 
     application.run_polling()
 
