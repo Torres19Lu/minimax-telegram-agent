@@ -16,6 +16,7 @@ async def _process_user_input(
     skills = context.bot_data["skills"]
     llm = context.bot_data["llm"]
     tools = context.bot_data["tools"]
+    mcp = context.bot_data.get("mcp")
 
     state = memory.get_state(user_id)
     skill_name = state["current_skill"]
@@ -33,8 +34,8 @@ async def _process_user_input(
         {
             "type": "function",
             "function": {
-                "name": "web_search",
-                "description": "Search the internet for current information, weather, news, etc.",
+                "name": "mcp_web_search",
+                "description": "Use MiniMax official MCP to search the internet for current information, weather, news, etc.",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -148,10 +149,14 @@ async def _process_user_input(
         for tc in assistant_message.tool_calls:
             func_name = tc.function.name
             func_args = json.loads(tc.function.arguments)
-            if func_name == "web_search":
+            if func_name == "mcp_web_search":
                 query = func_args.get("query", "")
                 await update.message.reply_text(f"🔍 正在搜索: {query}")
-                result = tools["web_search"](query)
+                if mcp:
+                    result = await mcp.web_search(query)
+                else:
+                    # Fallback to local duckduckgo
+                    result = tools["web_search"](query)
             elif func_name == "write_file":
                 filename = func_args.get("filename", "")
                 content = func_args.get("content", "")
@@ -223,3 +228,65 @@ async def voice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     await update.message.reply_text(f"📝 识别结果: {transcribed}")
     await _process_user_input(update, context, transcribed)
+
+
+async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle image messages using MiniMax MCP understand_image."""
+    mcp = context.bot_data.get("mcp")
+    if not mcp:
+        await update.message.reply_text("图片理解功能当前不可用（MCP 未连接）。")
+        return
+
+    photo = update.message.photo
+    if not photo:
+        await update.message.reply_text("没有收到图片。")
+        return
+
+    # Get highest resolution photo
+    largest = photo[-1]
+    photo_file = await largest.get_file()
+    ext = os.path.splitext(photo_file.file_path)[1] or ".jpg"
+    image_path = f"/home/lutorres/interest/minimax-telegram-agent/sandbox/photo_{update.effective_user.id}_{largest.file_unique_id}{ext}"
+    await photo_file.download_to_drive(image_path)
+
+    await update.message.reply_text("🖼️ 正在分析图片，请稍等...")
+
+    prompt = update.message.caption or "请描述这张图片的内容。"
+    result = await mcp.understand_image(prompt=prompt, image_source=image_path)
+
+    # Clean up
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
+    # Store as a user message with image analysis result
+    user_id = update.effective_user.id
+    memory = context.bot_data["memory"]
+    llm = context.bot_data["llm"]
+    skills = context.bot_data["skills"]
+
+    state = memory.get_state(user_id)
+    skill_name = state["current_skill"]
+    model_id = state["current_model"]
+    history = state["history"]
+
+    skill = skills.get(skill_name)
+    system_prompt = skill.system_prompt if skill else "你是一个友善的助手。"
+
+    # Build user message combining caption and image analysis
+    if update.message.caption:
+        combined_user_text = f"[用户发送了一张图片，附言: {update.message.caption}]\n[图片分析结果: {result}]"
+    else:
+        combined_user_text = f"[用户发送了一张图片]\n[图片分析结果: {result}]"
+
+    messages = [{"role": "system", "content": system_prompt}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": combined_user_text})
+
+    try:
+        reply = llm.chat(model_id, messages)
+    except Exception as e:
+        reply = f"调用模型时出错了: {e}"
+
+    memory.add_message(user_id, "user", combined_user_text)
+    memory.add_message(user_id, "assistant", reply)
+    await update.message.reply_text(reply)

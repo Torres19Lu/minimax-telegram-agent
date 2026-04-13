@@ -7,7 +7,8 @@ from skills.loader import load_skills
 from memory.store import MemoryStore
 from llm.client import LLMClient
 from bot.commands import skill_command, model_command, reset_command
-from bot.handlers import message_handler, voice_handler
+from bot.handlers import message_handler, voice_handler, photo_handler
+from mcp_client.wrapper import MiniMaxMCPClient
 from tools.search import web_search
 from tools.code_executor import write_file, read_file, list_files, execute_python, execute_shell
 
@@ -39,7 +40,23 @@ def main():
         "execute_shell": execute_shell,
     }
 
-    application = ApplicationBuilder().token(settings.telegram_bot_token).build()
+    async def post_init(app):
+        mcp = MiniMaxMCPClient(settings.minimax_api_key)
+        await mcp.connect()
+        app.bot_data["mcp"] = mcp
+
+    async def post_stop(app):
+        mcp = app.bot_data.get("mcp")
+        if mcp:
+            await mcp.disconnect()
+
+    application = (
+        ApplicationBuilder()
+        .token(settings.telegram_bot_token)
+        .post_init(post_init)
+        .post_stop(post_stop)
+        .build()
+    )
     application.bot_data["skills"] = skills
     application.bot_data["models"] = models
     application.bot_data["memory"] = memory
@@ -52,6 +69,7 @@ def main():
     application.add_handler(CommandHandler("reset", reset_command))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
     application.add_handler(MessageHandler(filters.VOICE, voice_handler))
+    application.add_handler(MessageHandler(filters.PHOTO, photo_handler))
 
     application.run_polling()
 
