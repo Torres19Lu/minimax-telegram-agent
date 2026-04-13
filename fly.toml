@@ -1,0 +1,23 @@
+app = 'minimax-telegram-agent'
+primary_region = 'sin'
+
+[build]
+
+[env]
+  DATA_DIR = '/app/data'
+  DEFAULT_MODEL = 'minimax-abab65'
+
+[[mounts]]
+  source = 'hermes_data'
+  destination = '/app/data'
+
+[[services]]
+  internal_port = 8080
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ['app']
+
+  [[services.ports]]
+    port = 8080
+    handlers = ['http']
