@@ -9,6 +9,7 @@ from llm.client import LLMClient
 from bot.commands import skill_command, model_command, reset_command
 from bot.handlers import message_handler, voice_handler
 from tools.search import web_search
+from tools.code_executor import write_file, read_file, list_files, execute_python, execute_shell
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -31,6 +32,11 @@ def main():
     llm = LLMClient(models)
     tools = {
         "web_search": web_search,
+        "write_file": write_file,
+        "read_file": read_file,
+        "list_files": list_files,
+        "execute_python": execute_python,
+        "execute_shell": execute_shell,
     }
 
     application = ApplicationBuilder().token(settings.telegram_bot_token).build()

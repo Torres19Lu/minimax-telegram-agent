@@ -46,7 +46,77 @@ async def _process_user_input(
                     "required": ["query"],
                 },
             },
-        }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "write_file",
+                "description": "Write a file to the sandbox directory.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "filename": {"type": "string", "description": "Relative path inside sandbox"},
+                        "content": {"type": "string", "description": "File content"},
+                    },
+                    "required": ["filename", "content"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "read_file",
+                "description": "Read a file from the sandbox directory.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "filename": {"type": "string", "description": "Relative path inside sandbox"},
+                    },
+                    "required": ["filename"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "list_files",
+                "description": "List files in the sandbox directory.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "subdir": {"type": "string", "description": "Optional subdirectory inside sandbox"},
+                    },
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "execute_python",
+                "description": "Execute a Python script in the sandbox and return output.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "script": {"type": "string", "description": "Python script content"},
+                    },
+                    "required": ["script"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "execute_shell",
+                "description": "Execute a safe shell command in the sandbox and return output.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "command": {"type": "string", "description": "Shell command"},
+                    },
+                    "required": ["command"],
+                },
+            },
+        },
     ]
 
     try:
@@ -82,6 +152,25 @@ async def _process_user_input(
                 query = func_args.get("query", "")
                 await update.message.reply_text(f"🔍 正在搜索: {query}")
                 result = tools["web_search"](query)
+            elif func_name == "write_file":
+                filename = func_args.get("filename", "")
+                content = func_args.get("content", "")
+                await update.message.reply_text(f"📝 正在写入文件: {filename}")
+                result = tools["write_file"](filename, content)
+            elif func_name == "read_file":
+                filename = func_args.get("filename", "")
+                result = tools["read_file"](filename)
+            elif func_name == "list_files":
+                subdir = func_args.get("subdir", "")
+                result = tools["list_files"](subdir)
+            elif func_name == "execute_python":
+                script = func_args.get("script", "")
+                await update.message.reply_text("🐍 正在执行 Python 脚本...")
+                result = tools["execute_python"](script)
+            elif func_name == "execute_shell":
+                command = func_args.get("command", "")
+                await update.message.reply_text(f"💻 正在执行命令: {command}")
+                result = tools["execute_shell"](command)
             else:
                 result = f"未知工具: {func_name}"
 
