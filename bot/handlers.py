@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -25,8 +26,10 @@ async def _process_user_input(
 
     skill = skills.get(skill_name)
     system_prompt = skill.system_prompt if skill else "你是一个友善的助手。"
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    full_system_prompt = f"{system_prompt}\n\n[系统提示: 当前日期和时间为 {current_time}，请在回答需要时效性的问题时参考此时间。]"
 
-    messages = [{"role": "system", "content": system_prompt}]
+    messages = [{"role": "system", "content": full_system_prompt}]
     messages.extend(history)
     messages.append({"role": "user", "content": user_text})
 
@@ -271,6 +274,8 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     skill = skills.get(skill_name)
     system_prompt = skill.system_prompt if skill else "你是一个友善的助手。"
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    full_system_prompt = f"{system_prompt}\n\n[系统提示: 当前日期和时间为 {current_time}，请在回答需要时效性的问题时参考此时间。]"
 
     # Build user message combining caption and image analysis
     if update.message.caption:
@@ -278,7 +283,7 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     else:
         combined_user_text = f"[用户发送了一张图片]\n[图片分析结果: {result}]"
 
-    messages = [{"role": "system", "content": system_prompt}]
+    messages = [{"role": "system", "content": full_system_prompt}]
     messages.extend(history)
     messages.append({"role": "user", "content": combined_user_text})
 
